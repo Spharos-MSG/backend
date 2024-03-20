@@ -35,6 +35,8 @@ public enum ErrorStatus implements BaseErrorCode {
     NOT_EXIST_PRODUCT_OPTION(HttpStatus.NOT_FOUND, "PRODUCT600", "존재하지 않는 상품옵션 입니다."),
     NOT_EXIST_PRODUCT(HttpStatus.NOT_FOUND, "PRODUCT601", "존재하지 않는 상품입니다."),
 
+    ALREADY_HAD_COUPON(HttpStatus.FORBIDDEN,"COUPON701","이미 보유중인 쿠폰입니다."),
+    ALREADY_USED_COUPON(HttpStatus.FORBIDDEN,"COUPON701","이미 사용한 쿠폰입니다."),
 
     ALREADY_HAD_COUPON(HttpStatus.FORBIDDEN,"COUPON701","이미 보유중인 쿠폰입니다."),
     ALREADY_USED_COUPON(HttpStatus.FORBIDDEN,"COUPON701","이미 사용한 쿠폰입니다."),
