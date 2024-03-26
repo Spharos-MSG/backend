@@ -38,8 +38,9 @@ public enum SuccessStatus implements BaseCode {
     REVIEW_SAVE_SUCCESS(HttpStatus.CREATED, "REVIEW200", "상품 리뷰 작성 성공"),
     REVIEW_UPDATE_SUCCESS(HttpStatus.OK, "REVIEW200", "상품 리뷰 수정 성공"),
     REVIEW_DELETE_SUCCESS(HttpStatus.OK, "REVIEW200", "상품 리뷰 삭제 성공"),
-
+    REVIEW_READ_SUCCESS(HttpStatus.OK, "REVIEW200","상품 리뷰 조회 성공"),
     SEARCH_RESULT_SUCCESS(HttpStatus.OK, "SEARCH200", "검색 결과 조회 성공");
+
     private final HttpStatus httpStatus;
     private final String status;
     private final String message;

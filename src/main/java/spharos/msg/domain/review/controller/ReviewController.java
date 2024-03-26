@@ -5,8 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +27,15 @@ import spharos.msg.global.api.ApiResponse;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    @Operation(summary = "상품 리뷰 상세 조회",
+    description = "id로 상품 리뷰를 조회합니다")
+    @GetMapping("/{reviewId}")
+    public ApiResponse<?> getReviewDetail(
+        @PathVariable("reviewId") Long reviewId
+    ){
+     return   reviewService.getReviewDetail(reviewId);
+    }
     @Operation(summary = "상품 리뷰 등록",
         description = "리뷰가 가능한 주문상세에 대해 상품 리뷰를 등록합니다")
     @PostMapping("/{productId}")
