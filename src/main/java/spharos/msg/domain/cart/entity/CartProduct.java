@@ -35,35 +35,11 @@ public class CartProduct extends BaseEntity {
     private ProductOption productOption;
 
     @Builder
-    public CartProduct(Integer cartProductQuantity, Boolean cartIsChecked, Users users, ProductOption productOption) {
+    public CartProduct(Long id, Integer cartProductQuantity, Boolean cartIsChecked, Users users, ProductOption productOption) {
+        this.id = id;
         this.cartProductQuantity = cartProductQuantity;
         this.cartIsChecked = cartIsChecked;
         this.users = users;
         this.productOption = productOption;
-    }
-
-
-    public void addCartProductQuantity(int productQuantity) {
-        this.cartProductQuantity += productQuantity;
-    }
-
-    public void updateCartProductOption(ProductOption productOption) {
-        this.productOption = productOption;
-    }
-
-    public void addOneCartProductQuantity() {
-        this.cartProductQuantity++;
-    }
-
-    public void minusOneCartProductQuantity() {
-        this.cartProductQuantity--;
-    }
-
-    public void checkCartProduct() {
-        this.cartIsChecked = true;
-    }
-
-    public void notCheckCartProduct() {
-        this.cartIsChecked = false;
     }
 }

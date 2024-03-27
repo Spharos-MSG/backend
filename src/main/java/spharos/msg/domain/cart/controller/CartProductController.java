@@ -44,50 +44,45 @@ public class CartProductController {
     @PatchMapping("/option/{cartId}")
     public ApiResponse<?> updateCartProductOption(
             @PathVariable Long cartId,
-            @RequestParam("productOptionId") Long productOptionId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @RequestParam("productOptionId") Long productOptionId
     ) {
-        return cartProductUpdateService.updateCartProductOption(productOptionId, cartId, userDetails.getUsername());
+        return cartProductUpdateService.updateCartProductOption(productOptionId, cartId);
     }
 
     @Operation(summary = "장바구니 수량 추가",
             description = "장바구니에 담긴 상품의 수량을 늘립니다.")
     @PatchMapping("/add/{cartId}")
     public ApiResponse<?> addCartProductQuantity(
-            @PathVariable Long cartId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long cartId
     ) {
-        return cartProductUpdateService.addCartProductQuantity(cartId, userDetails.getUsername());
+        return cartProductUpdateService.addCartProductQuantity(cartId);
     }
 
     @Operation(summary = "장바구니 수량 감소",
             description = "장바구니에 담긴 상품의 수량을 줄입니다.")
     @PatchMapping("/minus/{cartId}")
     public ApiResponse<?> minusCartProductQuantity(
-            @PathVariable Long cartId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long cartId
     ) {
-        return cartProductUpdateService.minusCartProductQuantity(cartId, userDetails.getUsername());
+        return cartProductUpdateService.minusCartProductQuantity(cartId);
     }
 
     @Operation(summary = "장바구니 체크 수정",
             description = "장바구니에 담긴 상품을 체크합니다.")
     @PatchMapping("/check/{cartId}")
     public ApiResponse<?> checkCartProduct(
-            @PathVariable Long cartId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long cartId
     ) {
-        return cartProductUpdateService.checkCartProduct(cartId, userDetails.getUsername());
+        return cartProductUpdateService.checkCartProduct(cartId);
     }
 
     @Operation(summary = "장바구니 체크 수정",
             description = "장바구니에 담긴 상품을 체크해제합니다.")
     @PatchMapping("/not-check/{cartId}")
     public ApiResponse<?> notCheckCartProduct(
-            @PathVariable Long cartId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long cartId
     ) {
-        return cartProductUpdateService.notCheckCartProduct(cartId, userDetails.getUsername());
+        return cartProductUpdateService.notCheckCartProduct(cartId);
     }
 
 
@@ -95,19 +90,17 @@ public class CartProductController {
             description = "장바구니에 담긴 상품을 삭제합니다.")
     @DeleteMapping("/{cartId}")
     public ApiResponse<?> deleteCart(
-            @PathVariable Long cartId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long cartId
     ) {
-        return cartProductService.deleteCart(cartId, userDetails.getUsername());
+        return cartProductService.deleteCart(cartId);
     }
 
     @Operation(summary = "장바구니 상품 옵션 조회",
             description = "장바구니에 담긴 상품의 옵션을 조회합니다.")
     @GetMapping("/option/{productId}")
     public ApiResponse<?> getCartOption(
-            @PathVariable Long productId,
-            @AuthenticationPrincipal UserDetails userDetails
+            @PathVariable Long productId
     ) {
-        return cartProductService.getCartOption(productId, userDetails.getUsername());
+        return cartProductService.getCartOption(productId);
     }
 }

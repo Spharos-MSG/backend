@@ -54,33 +54,39 @@ public class CartProductService {
     }
 
     @Transactional
-    public ApiResponse<?> deleteCart(Long cartId, String userUuid) {
+    public ApiResponse<?> deleteCart(Long cartId) {
         CartProduct cartProduct = cartProductRepository.findById(cartId).orElseThrow();
-        Users users = usersRepository.findByUuid(userUuid).orElseThrow();
         cartProductRepository.delete(cartProduct);
-
         return ApiResponse.of(SuccessStatus.CART_PRODUCT_DELETE_SUCCESS, null);
     }
 
     @Transactional(readOnly = true)
-    public ApiResponse<?> getCartOption(Long productId, String userUuid) {
+    public ApiResponse<?> getCartOption(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow();
 
         return ApiResponse.of(SuccessStatus.CART_PRODUCT_OPTION_SUCCESS,
                 productOptionRepository.findByProduct(product)
                         .stream()
                         .map(CartProductOptionResponseDto::new)
-                        .collect(Collectors.toList()));
+                        .toList());
     }
 
     private ApiResponse<?> addCart(Users users, Long productOptionId, ProductOption productOption, Integer productQuantity) {
         List<CartProduct> cartProducts = cartProductRepository.findByUsers(users);
+        //이미 장바구니에 담긴 상품의 경우 개수 더해서 save하기
         for (CartProduct cartProduct : cartProducts) {
             if (cartProduct.getProductOption().getProductOptionId().equals(productOptionId)) {
-                cartProduct.addCartProductQuantity(productQuantity);
+                cartProductRepository.save(CartProduct.builder()
+                        .id(cartProduct.getId())
+                        .cartProductQuantity(cartProduct.getCartProductQuantity()+productQuantity)
+                        .productOption(cartProduct.getProductOption())
+                        .cartIsChecked(cartProduct.getCartIsChecked())
+                        .users(cartProduct.getUsers())
+                        .build());
                 return ApiResponse.of(SuccessStatus.CART_PRODUCT_ADD_SUCCESS, null);
             }
         }
+        //새롭게 담는 상품의 경우 새로 생성하기
         CartProduct cartProduct = CartProduct.builder()
                 .cartProductQuantity(productQuantity)
                 .cartIsChecked(false)
