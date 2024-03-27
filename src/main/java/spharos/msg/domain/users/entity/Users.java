@@ -77,6 +77,14 @@ public class Users extends BaseEntity implements UserDetails {
         this.addresses.add(address);
     }
 
+    /**
+     * Entity의 userName을 반환합니다.
+     * @return userName;
+     */
+    public String readUserName(){
+        return this.userName;
+    }
+
     @Override
     public String toString() {
         return "Users{" +
