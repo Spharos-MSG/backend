@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import spharos.msg.domain.search.dto.SearchResponse.SearchProductDto;
+import spharos.msg.domain.search.dto.SearchResponse.SearchInputDto;
+import spharos.msg.domain.search.dto.SearchResponse.SearchProductDtos;
 import spharos.msg.domain.search.service.SearchService;
 import spharos.msg.global.api.ApiResponse;
 import spharos.msg.global.api.code.status.SuccessStatus;
@@ -23,11 +24,18 @@ public class SearchController {
     private final SearchService searchService;
 
     @GetMapping("search")
-    public ApiResponse<List<SearchProductDto>> searchResultAPI(
+    public ApiResponse<SearchProductDtos> searchResultAPI(
         @RequestParam(value = "keyword") String keyword,
         @RequestParam(value = "index", required = false, defaultValue = "0") int index) {
-        log.info("SearchResult, keyword ={}, index ={}", keyword, index);
-        List<SearchProductDto> searchProductDtos = searchService.findMatchProducts(keyword, index);
+        SearchProductDtos searchProductDtos = searchService.findMatchProducts(keyword, index);
         return ApiResponse.of(SuccessStatus.SEARCH_RESULT_SUCCESS, searchProductDtos);
+    }
+
+    @GetMapping("search-list")
+    public ApiResponse<List<SearchInputDto>> searchInputDto(
+        @RequestParam(value = "keyword") String keyword
+    ) {
+        List<SearchInputDto> searchInputDtos = searchService.findExpectedKeywords(keyword);
+        return ApiResponse.of(SuccessStatus.SEARCH_INPUT_SUCCESS, searchInputDtos);
     }
 }

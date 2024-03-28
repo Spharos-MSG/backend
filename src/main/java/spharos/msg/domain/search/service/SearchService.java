@@ -1,12 +1,15 @@
 package spharos.msg.domain.search.service;
 
-import java.math.BigDecimal;
+import static java.util.Comparator.comparingInt;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import spharos.msg.domain.product.entity.Product;
-import spharos.msg.domain.search.dto.SearchResponse.SearchProductDto;
+import spharos.msg.domain.search.dto.SearchResponse.SearchInputDto;
+import spharos.msg.domain.search.dto.SearchResponse.SearchProductDtos;
 import spharos.msg.domain.search.repository.SearchRepository;
 
 @Service
@@ -14,29 +17,85 @@ import spharos.msg.domain.search.repository.SearchRepository;
 @Transactional(readOnly = true)
 public class SearchService {
 
+    private static final String ONLY_WORD_NUMBER_BLANK = "[^a-zA-Z가-힣0-9\\s]";
+    private static final String KEYWORD_DELIMITER = " ";
+    private static final String REMOVE = "";
+    private static final String REMOVE_OVER_TWO_BLANK = "\\s{2,}";
+
     private final SearchRepository searchRepository;
 
-    public List<SearchProductDto> findMatchProducts(String keyword, int index) {
-        List<Product> products = searchRepository.searchAllProduct(keyword, index);
-        return products
+    public SearchProductDtos findMatchProducts(String keyword, int index) {
+        keyword = trimKeyword(keyword);
+        return searchRepository.searchAllProduct(keyword, index);
+    }
+
+    public List<SearchInputDto> findExpectedKeywords(String keyword) {
+        keyword = trimKeyword(keyword);
+
+        List<SearchInputDto> searchInputDtos = new ArrayList<>();
+        List<String> essentialProductNames = searchRepository
+            .searchAllKeyword(keyword)
             .stream()
-            .map(this::toSearchProductDto)
+            .map(product -> trimKeyword(product.getProductName()))
+            .toList();
+
+        for (String essentialProductName : essentialProductNames) {
+            List<String> searchWords = getSearchWords(essentialProductName, keyword);
+            searchInputDtos.addAll(toSearchInputDto(searchWords));
+        }
+
+        return searchInputDtos
+            .stream()
+            .distinct()
+            .sorted(comparingInt(w -> w.getProductName().length()))
             .toList();
     }
 
-    private SearchProductDto toSearchProductDto(Product product) {
-        return SearchProductDto.builder()
-            .productId(product.getId())
-            .productName(product.getProductName())
-            .productPrice(product.getProductPrice())
-            .discountRate(product.getDiscountRate())
-            // TODO: 현재 이미지를 불러오는 로직이 없기 때문에 임시 정적 이미지를 넣어둠
-            .image(
-                "https://i.namu.wiki/i/DIWQPMFg_xE7JxIv0-4M5PbXco2d-BynsivSWqt6enqDgXOKw0nuZznBUGV-7FtJilQEY7zxodgkZcYlQXDJw.webp")
-            // TODO: isLike 테이블이 어떻게 될지 모르기 때문에 일단 정적으로 넣어
-            .isLike(false)
-            .productStar(new BigDecimal("4.5")) //TODO: 아직 없어서 정적으로 넣어둠.
-            .build();
+    private String trimKeyword(String keyword) {
+        return keyword
+            .replaceAll(REMOVE_OVER_TWO_BLANK, KEYWORD_DELIMITER)
+            .replaceAll(ONLY_WORD_NUMBER_BLANK, REMOVE)
+            .trim();
     }
 
+    private List<String> getSearchWords(String essentialName, String keyword) {
+        int startIndex = essentialName.indexOf(keyword);
+        List<String> splitWords = Arrays.asList(essentialName.split(KEYWORD_DELIMITER));
+        return getWordsWithinKeyword(essentialName, startIndex, splitWords);
+    }
+
+    private List<String> getWordsWithinKeyword(
+        String essentialName,
+        int startIndex,
+        List<String> splitWords) {
+
+        List<String> resultWords = new ArrayList<>();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        splitWords.stream()
+            .filter(word -> essentialName.indexOf(word) >= startIndex)
+            .forEach(word -> addToResultWord(resultWords, stringBuilder, word));
+
+        return resultWords;
+    }
+
+    private void addToResultWord(
+        List<String> resultWords, StringBuilder stringBuilder, String word) {
+        String resultWord = stringBuilder
+            .append(KEYWORD_DELIMITER)
+            .append(word)
+            .toString();
+
+        resultWords.add(resultWord);
+    }
+
+    private List<SearchInputDto> toSearchInputDto(List<String> searchWords) {
+        return searchWords
+            .stream()
+            .map(word -> SearchInputDto
+                .builder()
+                .productName(word)
+                .build())
+            .toList();
+    }
 }

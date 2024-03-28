@@ -10,6 +10,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    show-sql: true
   data:
     redis:
       host: ${REDIS_DB_ADDRESS}

@@ -44,7 +44,7 @@ public class SecurityConfiguration {
                     // 허용 범위
                     .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/api-docs/**")
                     .permitAll()
-                    //.requestMatchers("/api/v1/**").permitAll() //테스트용 주석 제거시, 모든 api 호출 가능.
+                    .requestMatchers("/api/v1/**").permitAll() //테스트용 주석 제거시, 모든 api 호출 가능.
                     .requestMatchers("/api/v1/users/**").permitAll()
                     .requestMatchers("/api/v1/reissue/**").permitAll()
                     .requestMatchers("/example/**").permitAll()
