@@ -15,7 +15,6 @@ spring:
       host: ${REDIS_DB_ADDRESS}
       port: ${REDIS_PORT}
 
-
 logging:
   level:
     org.hibernate.type: debug

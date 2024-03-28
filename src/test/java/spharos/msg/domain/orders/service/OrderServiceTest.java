@@ -59,7 +59,6 @@ class OrderServiceTest {
                 .email("tjdvy963@naver.com")
                 .loginId("abcdsd")
                 .uuid("uuid")
-                .baseAddressId(1L)
                 .password("1234")
                 .phoneNumber("01092312316")
                 .build()

@@ -5,26 +5,21 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import spharos.msg.domain.users.dto.SignUpRequestDto;
 import spharos.msg.global.entity.BaseEntity;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 public class Users extends BaseEntity implements UserDetails {
 
     @Id
@@ -34,61 +29,62 @@ public class Users extends BaseEntity implements UserDetails {
 
     @NotBlank
     @Size(min = 5, max = 20)
+    @Column(name = "login_id")
     private String loginId;
 
+    @Column(name = "uuid")
     private String uuid;
 
     @NotBlank
+    @Column(name = "password")
     private String password;
 
     @NotBlank()
     @Pattern(regexp = "^\\d{10,11}$")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @Email
+    @Column(name = "email")
     private String email;
 
     @NotBlank
     @Size(min = 2, max = 50)
+    @Column(name = "user_name")
     private String userName;
 
-    @Column(columnDefinition = "bigint default 0")
-    private Long baseAddressId;
+    @Column(name = "address")
+    private String address;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Address> addresses = new ArrayList<>();
-
-    public static Users signUpDtoToEntity(SignUpRequestDto signUpRequestDto) {
-        signUpRequestDto.setPassword(passwordToHash(signUpRequestDto.getPassword()));
-        return Users
-                .builder()
-                .loginId(signUpRequestDto.getLoginId())
-                .password(signUpRequestDto.getPassword())
-                .userName(signUpRequestDto.getUsername())
-                .email(signUpRequestDto.getEmail())
-                .phoneNumber(signUpRequestDto.getPhoneNumber())
-                .uuid(UUID.randomUUID().toString())
-                .baseAddressId(0L)
-                .build();
+    @Builder
+    public Users(String loginId, String uuid, String password, String phoneNumber, String email,
+            String userName, String address) {
+        this.loginId = loginId;
+        this.uuid = uuid;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.userName = userName;
+        this.address = address;
     }
 
-    public void addAddress(Address address) {
-        this.addresses.add(address);
+
+    /**
+     * Entity의 userName을 반환합니다.
+     *
+     * @return userName;
+     */
+    public String readUserName() {
+        return this.userName;
     }
 
-    @Override
-    public String toString() {
-        return "Users{" +
-                "id=" + id +
-                ", loginId='" + loginId + '\'' +
-                ", uuid='" + uuid + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+
+    public Users(String uuid) {
+        this.uuid = uuid;
     }
 
-    public static String passwordToHash(String password) {
-        return new BCryptPasswordEncoder().encode(password);
+    public void passwordToHash(String password) {
+        this.password = new BCryptPasswordEncoder().encode(password);
     }
 
     @Override

@@ -11,13 +11,14 @@ import java.util.Map;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import spharos.msg.domain.users.entity.Users;
 import spharos.msg.global.api.code.status.ErrorStatus;
 import spharos.msg.global.api.exception.JwtTokenException;
-
-import static spharos.msg.domain.users.service.UsersService.BEARER;
+import spharos.msg.global.redis.RedisService;
 
 @Slf4j
 @Service
@@ -25,6 +26,16 @@ import static spharos.msg.domain.users.service.UsersService.BEARER;
 public class JwtTokenProvider {
 
     private final Environment env;
+    private final RedisService redisService;
+
+    public static final String BEARER = "Bearer";
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String REFRESH_TOKEN = "refreshToken";
+
+    @Value("${JWT.access-token-expiration}")
+    private long accessTokenExpiration;
+    @Value("${JWT.refresh-token-expiration}")
+    private long refreshTokenExpiration;
 
     /**
      * "Bearer " + token, "Bearer " 삭제 후, uuid 반환하게 됩니다.
@@ -102,5 +113,20 @@ public class JwtTokenProvider {
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(env.getProperty("JWT.SECRET_KEY"));
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String createRefreshToken(Users users) {
+        String token = generateToken(users, refreshTokenExpiration, REFRESH_TOKEN);
+        String uuid = users.getUuid();
+
+        if(Boolean.TRUE.equals(redisService.isRefreshTokenExist(uuid))){
+            redisService.deleteRefreshToken(uuid);
+        }
+
+        redisService.saveRefreshToken(uuid, token, refreshTokenExpiration);
+        return token;
+    }
+    public String createAccessToken(Users users) {
+        return generateToken(users, accessTokenExpiration, ACCESS_TOKEN);
     }
 }

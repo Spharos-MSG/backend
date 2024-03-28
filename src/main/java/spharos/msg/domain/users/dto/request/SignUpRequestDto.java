@@ -1,4 +1,4 @@
-package spharos.msg.domain.users.dto;
+package spharos.msg.domain.users.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,5 +13,5 @@ public class SignUpRequestDto {
     public String address;
     public String phoneNumber;
     public String email;
-    public Boolean isEasy;
+//    public Boolean isEasy;
 }
